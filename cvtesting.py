@@ -4,6 +4,7 @@ faceCascade = cv2.CascadeClassifier('/usr/local/lib/python3.7/dist-packages/cv2/
 cap = cv2.VideoCapture(0)
 cap.set(3,640) # set Width
 cap.set(4,480) # set Height
+
 while True:
     ret, img = cap.read()
     img = cv2.flip(img, -1)

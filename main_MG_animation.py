@@ -9,6 +9,8 @@ import MG_serial
 def main(): 
 	comms = MG_serial.Animation()
 	comms.open_serial()
+	
+	
 	print(comms.ser.read(8))
 	count = 0
 	while True:
@@ -17,7 +19,9 @@ def main():
 			comms.ser.read(8)
     
 		data = input("Enter something : ")
-		if(data == "animate"): 
+		data = data +'\r\n'
+		if(data == "animate\r\n"):
+			comms.generate_order(1) 
 			comms.dance_one()
 		comms.ser.write(data.encode())
 		read_serial = comms.ser.readline().decode()

@@ -10,6 +10,8 @@ class Animation():
 	
 	def __init__(self): 
 		self.mystr = "hello"
+		self.row1 = []
+		self.row2 = []
 		
 	def open_serial(self): 
 		port='/dev/ttyAMA0'
@@ -38,16 +40,20 @@ class Animation():
 	def generate_order(self,order):
 		#sides in
 		if(order == 0):
-			return [0,1,2,3,4,5,6,7,8,9,10,11],[23,22,21,20,19,18,17,16,15,14,13,12]
-		
+			self.row1 = [0,1,2,3,4,5,6,7,8,9,10,11]
+			self.row2 = [23,22,21,20,19,18,17,16,15,14,13,12]
+		if(order == 1):
+			self.row1 = [12]
+			self.row2 = [23,22,21,20,19,18,17,16,15,14,13]
+			 
 	def dance_up(self): 
 		delay = 0
 		#lets dance our windows
 		#What should it look like?
 		#goToE {addr} {%between 2 and 3} {speed} {time delay}
-		row1,row2 = self.generate_order(0)
+		#row1,row2 = self.generate_order(0)
 		
-		for item in row1:
+		for item in self.row1:
 			delay = delay + 2000
 			position = 95
 			speed = 30
@@ -58,7 +64,7 @@ class Animation():
 			read_ser = self.ser.readline().decode()
 			print (read_ser)
 
-		for item in row2:
+		for item in self.row2:
 			delay = delay + 2000
 			position = 95
 			speed = 30
@@ -77,11 +83,11 @@ class Animation():
 		#lets dance our windows
 		#What should it look like?
 		#goToE {addr} {%between 2 and 3} {speed} {time delay}
-		row1,row2 = self.generate_order(0)
+		#row1,row2 = self.generate_order(0)
 		
-		for item in row1:
+		for item in self.row1:
 			delay = delay + 2000
-			position = 15
+			position = 25
 			speed = 30
 			print(item)
 			
@@ -90,9 +96,9 @@ class Animation():
 			read_ser = self.ser.readline().decode()
 			print (read_ser)
 
-		for item in row2:
+		for item in self.row2:
 			delay = delay + 2000
-			position = 15
+			position = 25
 			speed = 30
 			print(item)
 	
@@ -112,5 +118,6 @@ class Animation():
 if __name__ == "__main__": 
 	myany = Animation() 
 	myany.open_serial()
+	myany.generate_order(1)
 	myany.dance_one()
 	
