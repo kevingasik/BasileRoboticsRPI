@@ -14,10 +14,7 @@ def main():
 	print(comms.ser.read(8))
 	count = 0
 	while True:
-		if(count == 0):
-			count = 1
-			comms.ser.read(8)
-    
+		
 		data = input("Enter something : ")
 		data = data +'\r\n'
 		if(data == "animate\r\n"):
