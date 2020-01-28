@@ -1,5 +1,8 @@
 import numpy as np
 import cv2
+import imutils.video import VideoStream
+
+
 faceCascade = cv2.CascadeClassifier('/usr/local/lib/python3.7/dist-packages/cv2/data/haarcascade_frontalface_default.xml')
 cap = cv2.VideoCapture(0)
 cap.set(3,640) # set Width
