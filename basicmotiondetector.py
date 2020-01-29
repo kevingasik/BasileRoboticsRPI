@@ -31,22 +31,22 @@ class BasicMotionDetector:
 		# the current grame and the revious frames, then comuter
 		# the pixel-wse differences between the cureent frame 
 		# and running avergae
-		cv2.accumlateWeighted(image, self.avg, self.accumWeight)
+		cv2.accumulateWeighted(image, self.avg, self.accumWeight)
 		frameDelta = cv2.absdiff(image, cv2.convertScaleAbs(self.avg))
 		# threshold the dleta image and apply a series of dilations
 		# to help fill in holes
-		thresh = cv2.threshold(frameDelta, seld.deltaThresh, 255, cv2.THRESH_BINARY)[1]
+		thresh = cv2.threshold(frameDelta, self.deltaThresh, 255, cv2.THRESH_BINARY)[1]
 		thresh = cv2.dilate(thresh, None, iterations=2)
 		
 		#find contous in the thresholded image, taking care to 
 		# use the appreopriate version of OpenCV
-		cnts = cv2.findContous(thresh, cv2.RETR_EXTERNAL,cv2, cv2.CHAIN_APPROX_SIMPLE)
+		cnts = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 		cnts = imutils.grab_contours(cnts)
 		
 		#loop over the contours
 		for c in cnts:
-				# only add the contour to the locations list if it
-				# exceeds the minimu area
+			# only add the contour to the locations list if it
+			# exceeds the minimu area
 			if cv2.contourArea(c) > self.minArea:
 				locs.append(c)
 		
