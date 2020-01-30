@@ -36,7 +36,7 @@ while True:
 
 		
 		frame = stream.read()
-		frame = imutils.resize(frame, width=1200)
+		frame = imutils.resize(frame, width=500)
 		
 		# convert the frame to grayscale, blue it slightly, update the motion detector
 		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -56,8 +56,7 @@ while True:
 			#init the minimum and maximum xy coords
 			(minX, minY) = (np.inf, np.inf)
 			(maxX, maxY) = (-np.inf,-np.inf)
-			print("hello")
-			
+
 			#loop over the ocations of motion and accumulate the minimum and maximum locations of the bounding boxes
 			for l in locs:
 				(x, y, w,h) = cv2.boundingRect(l)
