@@ -11,7 +11,7 @@ def main():
 	comms.open_serial()
 	
 	
-	print(comms.ser.read(8))
+	print(comms.ser.readline())
 	count = 0
 	while True:
 		

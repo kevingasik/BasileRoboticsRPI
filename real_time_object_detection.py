@@ -1,5 +1,5 @@
 # USAGE
-# python real_time_object_detection.py --prototxt MobileNetSSD_deploy.prototxt.txt --model MobileNetSSD_deploy.caffemodel
+# python3 real_time_object_detection.py --prototxt MobileNetSSD_deploy.prototxt.txt --model MobileNetSSD_deploy.caffemodel
 
 # import the necessary packages
 from imutils.video import VideoStream
@@ -59,22 +59,37 @@ while True:
 	# predictions
 	net.setInput(blob)
 	detections = net.forward()
+	
+	cv2.line(frame, (w // 2, h ), (w // 2, 0), (255, 255, 255), 2)
 
 	# loop over the detections
 	for i in np.arange(0, detections.shape[2]):
 		# extract the confidence (i.e., probability) associated with
 		# the prediction
 		confidence = detections[0, 0, i, 2]
-
+		centroids = np.zeros((detections.shape[2], 2), dtype="int")
 		# filter out weak detections by ensuring the `confidence` is
 		# greater than the minimum confidence
 		if confidence > args["confidence"]:
+			
+		
+				
 			# extract the index of the class label from the
 			# `detections`, then compute the (x, y)-coordinates of
 			# the bounding box for the object
 			idx = int(detections[0, 0, i, 1])
+							# if the class label is not a person, ignore it
+			if CLASSES[idx] != "person":
+				continue
+			
 			box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
 			(startX, startY, endX, endY) = box.astype("int")
+			cX = int((startX + endX) / 2.0)
+			cY = int((startY + endY) / 2.0)
+			centroids[i] = (cX, cY)
+			
+			
+
 
 			# draw the prediction on the frame
 			label = "{}: {:.2f}%".format(CLASSES[idx],
@@ -84,6 +99,39 @@ while True:
 			y = startY - 15 if startY - 15 > 15 else startY + 15
 			cv2.putText(frame, label, (startX, y),
 				cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
+			for centroid in centroids:
+				direction = centroid[0]
+				totalUp = 0
+				totalDown = 0
+			
+				if centroid.any():
+					# if the direction is negative (indicating the object
+					# is moving up) AND the centroid is above the center
+					# line, count the object
+					if direction < w // 2: # and centroid[1] < H // 2:
+						totalUp += 1
+
+					# if the direction is positive (indicating the object
+					# is moving down) AND the centroid is below the
+					# center line, count the object
+					elif direction > w // 2 :# and centroid[1] > H // 2:
+						totalDown += 1
+				cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
+
+
+	# construct a tuple of information we will be displaying on the
+	# frame
+	info = [
+		("left", totalUp),
+		("right", totalDown),
+	]
+	
+	# loop over the info tuples and draw them on our frame
+	for (i, (k, v)) in enumerate(info):
+		text = "{}: {}".format(k, v)
+		cv2.putText(frame, text, (10, h - ((i * 20) + 20)),
+			cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
 
 	# show the output frame
 	cv2.imshow("Frame", frame)
