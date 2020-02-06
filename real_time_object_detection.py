@@ -68,6 +68,8 @@ while True:
 		# the prediction
 		confidence = detections[0, 0, i, 2]
 		centroids = np.zeros((detections.shape[2], 2), dtype="int")
+		totalUp = 0
+		totalDown = 0
 		# filter out weak detections by ensuring the `confidence` is
 		# greater than the minimum confidence
 		if confidence > args["confidence"]:
@@ -99,10 +101,10 @@ while True:
 			y = startY - 15 if startY - 15 > 15 else startY + 15
 			cv2.putText(frame, label, (startX, y),
 				cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
+		
+			
 			for centroid in centroids:
 				direction = centroid[0]
-				totalUp = 0
-				totalDown = 0
 			
 				if centroid.any():
 					# if the direction is negative (indicating the object
