@@ -10,6 +10,7 @@ import imutils
 import time
 import cv2
 
+
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--prototxt", required=True,
@@ -43,6 +44,15 @@ vs = VideoStream(src=0).start()
 time.sleep(2.0)
 fps = FPS().start()
 
+#import serial class and open serial port
+
+
+#establish comms with an arduino
+
+#move two servos that are being controlled by the OPENCM board... 
+
+#complete
+
 # loop over the frames from the video stream
 while True:
 	# grab the frame from the threaded video stream and resize it
@@ -60,16 +70,19 @@ while True:
 	net.setInput(blob)
 	detections = net.forward()
 	
-	cv2.line(frame, (w // 2, h ), (w // 2, 0), (255, 255, 255), 2)
-
+	cv2.line(frame, (w // 2, h ), (w // 2, 0), (0, 255, 0), 2)
+	cv2.line(frame, (w // 2 + 2, h ), (w // 2 + 2, 0), (0, 128, 0), 2)
+	cv2.line(frame, (w // 2 - 2, h ), (w // 2 - 2, 0), (0, 128, 0), 2)
+	
+	totalUp = 0
+	totalDown = 0
 	# loop over the detections
 	for i in np.arange(0, detections.shape[2]):
 		# extract the confidence (i.e., probability) associated with
 		# the prediction
 		confidence = detections[0, 0, i, 2]
 		centroids = np.zeros((detections.shape[2], 2), dtype="int")
-		totalUp = 0
-		totalDown = 0
+		
 		# filter out weak detections by ensuring the `confidence` is
 		# greater than the minimum confidence
 		if confidence > args["confidence"]:
@@ -131,8 +144,8 @@ while True:
 	# loop over the info tuples and draw them on our frame
 	for (i, (k, v)) in enumerate(info):
 		text = "{}: {}".format(k, v)
-		cv2.putText(frame, text, (10, h - ((i * 20) + 20)),
-			cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+		cv2.putText(frame, text, (w // 4 + i*w//2 - 30, h - (20)),
+			cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 255), 2)
 
 
 	# show the output frame
