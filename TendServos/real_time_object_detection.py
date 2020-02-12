@@ -1,10 +1,10 @@
 # USAGE
 # python3 real_time_object_detection.py --prototxt MobileNetSSD_deploy.prototxt.txt --model MobileNetSSD_deploy.caffemodel
-
 # import the necessary packages
 from imutils.video import VideoStream
 from imutils.video import FPS
 from tendserial import TendSerial
+from realtimehelper import RealTimeHelper
 import numpy as np
 import argparse
 import imutils
@@ -22,15 +22,12 @@ ap.add_argument("-c", "--confidence", type=float, default=0.2,
 	help="minimum probability to filter weak detections")
 args = vars(ap.parse_args())
 
+rth = RealTimeHelper()
+
 # initialize the list of class labels MobileNet SSD was trained to
 # detect, then generate a set of bounding box colors for each class
-CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-	"bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-	"dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-	"sofa", "train", "tvmonitor"]
-	
-#CLASSES = ["background","person","sofa", "train", "tvmonitor","aeroplane", "bicycle", "bird", "boat"]
-	
+CLASSES = rth.classes
+
 		
 COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
@@ -45,21 +42,27 @@ vs = VideoStream(src=0).start()
 time.sleep(2.0)
 fps = FPS().start()
 
+frame = vs.read()
+frame = imutils.resize(frame, width=1000)
+# grab the frame dimensions and convert it to a blob
+(h, w) = frame.shape[:2]
+rth.setSize(w,h)
+
 #import serial class and open serial port
 openCM_comms = TendSerial()
 #establish comms with an arduino
 try:
-	openCM_comms.open()
+	openCM_comms.open_serial()
+	# keep going
 except: 
-	print("Failed to open comms:  Check Connection \n")
-	print("---------------------------------------")
+	print("[INFO} Failed to open comms...  Check Connection")
 	
 #move two servos that are being controlled by the OPENCM board... 
-#if(openCM_comms.openPort == True): 
+if(openCM_comms.openPort == True): 
 	# if we successfully opened the serial port 
 	# then we can start communicating to the servos
 	# if not then just look at the video
-	
+	print("[INFO} Success to opened Comm port to OpenCM Board...")
 
 #complete
 
@@ -80,10 +83,9 @@ while True:
 	net.setInput(blob)
 	detections = net.forward()
 	
-	cv2.line(frame, (w // 2, h ), (w // 2, 0), (0, 255, 0), 2)
-	cv2.line(frame, (w // 2 + 2, h ), (w // 2 + 2, 0), (0, 128, 0), 2)
-	cv2.line(frame, (w // 2 - 2, h ), (w // 2 - 2, 0), (0, 128, 0), 2)
-	
+	#create a line with the realtimehelper class
+	rth.create_line(frame)
+
 	totalUp = 0
 	totalDown = 0
 	# loop over the detections
@@ -96,9 +98,6 @@ while True:
 		# filter out weak detections by ensuring the `confidence` is
 		# greater than the minimum confidence
 		if confidence > args["confidence"]:
-			
-		
-				
 			# extract the index of the class label from the
 			# `detections`, then compute the (x, y)-coordinates of
 			# the bounding box for the object
@@ -113,9 +112,6 @@ while True:
 			cY = int((startY + endY) / 2.0)
 			centroids[i] = (cX, cY)
 			
-			
-
-
 			# draw the prediction on the frame
 			label = "{}: {:.2f}%".format(CLASSES[idx],
 				confidence * 100)
@@ -124,8 +120,7 @@ while True:
 			y = startY - 15 if startY - 15 > 15 else startY + 15
 			cv2.putText(frame, label, (startX, y),
 				cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
-		
-			
+				
 			for centroid in centroids:
 				direction = centroid[0]
 			
@@ -152,11 +147,7 @@ while True:
 	]
 	
 	# loop over the info tuples and draw them on our frame
-	for (i, (k, v)) in enumerate(info):
-		text = "{}: {}".format(k, v)
-		cv2.putText(frame, text, (w // 4 + i*w//2 - 30, h - (20)),
-			cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 255), 2)
-
+	rth.create_text(frame,info)
 
 	# show the output frame
 	cv2.imshow("Frame", frame)

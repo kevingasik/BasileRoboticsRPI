@@ -12,7 +12,6 @@ class TendSerial():
 		self.mystr = "hello"
 		self.row1 = []
 		self.row2 = []
-		
 		self.openPort = False
 		
 	def open_serial(self): 
@@ -42,6 +41,16 @@ class TendSerial():
 		self.openPort = True
 		return
 		
+	def send_serial(self, sendTime, right, left): 
+		# if time is greater than the sendTime
+		# send which ever right or left is greater
+		if(right > left): 
+			send = right
+		elif(left > right): 
+			send = left
+		else: 
+			send = equal
+		self.ser.write(send.encode()) 
 		
 
 
