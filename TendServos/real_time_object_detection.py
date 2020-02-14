@@ -96,17 +96,7 @@ while True:
 		centroids = np.zeros((detections.shape[2], 2), dtype="int")
 		
 		
-		###
-		#
-		#
-		#
-		#
-		#
-		#
-		#
-		#
-		#
-		#
+
 		# filter out weak detections by ensuring the `confidence` is
 		# greater than the minimum confidence
 		if confidence > args["confidence"]:
