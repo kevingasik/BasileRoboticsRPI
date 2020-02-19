@@ -28,7 +28,6 @@ rth = RealTimeHelper()
 # detect, then generate a set of bounding box colors for each class
 CLASSES = rth.classes
 
-		
 COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
 # load our serialized model from disk
@@ -51,6 +50,8 @@ rth.setSize(w,h)
 #import serial class and open serial port
 openCM_comms = TendSerial()
 #establish comms with an arduino
+
+
 try:
 	openCM_comms.open_serial()
 	# keep going
@@ -64,28 +65,24 @@ if(openCM_comms.openPort == True):
 	# if not then just look at the video
 	print("[INFO} Success to opened Comm port to OpenCM Board...")
 
-#complete
-
 # loop over the frames from the video stream
 while True:
+	
 	# grab the frame from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
 	frame = vs.read()
 	frame = imutils.resize(frame, width=1000)
-
+	
 	# grab the frame dimensions and convert it to a blob
 	(h, w) = frame.shape[:2]
-	blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),
-		0.007843, (300, 300), 127.5)
-
+	
+	blob = rth.create_blob(frame)
 	# pass the blob through the network and obtain the detections and
 	# predictions
 	net.setInput(blob)
 	detections = net.forward()
-	
 	#create a line with the realtimehelper class
 	rth.create_line(frame)
-
 	totalUp = 0
 	totalDown = 0
 	# loop over the detections
@@ -95,8 +92,6 @@ while True:
 		confidence = detections[0, 0, i, 2]
 		centroids = np.zeros((detections.shape[2], 2), dtype="int")
 		
-		
-
 		# filter out weak detections by ensuring the `confidence` is
 		# greater than the minimum confidence
 		if confidence > args["confidence"]:
@@ -115,14 +110,8 @@ while True:
 			centroids[i] = (cX, cY)
 			
 			# draw the prediction on the frame
-			label = "{}: {:.2f}%".format(CLASSES[idx],
-				confidence * 100)
-			cv2.rectangle(frame, (startX, startY), (endX, endY),
-				COLORS[idx], 2)
-			y = startY - 15 if startY - 15 > 15 else startY + 15
-			cv2.putText(frame, label, (startX, y),
-				cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
-				
+			label, y = rth.draw_predictions(frame,startX,startY,endX,endY,COLORS,idx)
+						
 			for centroid in centroids:
 				direction = centroid[0]
 			

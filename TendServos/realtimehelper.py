@@ -6,6 +6,7 @@ import time
 import cv2
 
 
+
 class RealTimeHelper(): 
 	
 	def __init__(self): 
@@ -32,7 +33,19 @@ class RealTimeHelper():
 			text = "{}: {}".format(k, v)
 			cv2.putText(frame, text, (self.width // 4 + i*self.width//2 - 30, self.height - (20)),
 			cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 255), 2)
-
+			
+	def create_blob(self,frame):
+		# grab the frame dimensions and convert it to a blob
+		blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),0.007843, (300, 300), 127.5) 
+		return blob
+		
+	def draw_predictions(frame,startX,startY,endX,endY,COLORS,idx): 
+		label = "{}: {:.2f}%".format(CLASSES[idx],confidence * 100)
+		cv2.rectangle(frame, (startX, startY), (endX, endY),COLORS[idx], 2)
+		y = startY - 15 if startY - 15 > 15 else startY + 15
+		cv2.putText(frame, label, (startX, y),cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
+		return label,y
+		
 	
 	#def create_text(self): 
 		

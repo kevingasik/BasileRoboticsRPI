@@ -4,6 +4,7 @@ import serial
 import time
 import os
 import termios
+import cv2
 
 
 class TendSerial(): 
@@ -13,6 +14,8 @@ class TendSerial():
 		self.row1 = []
 		self.row2 = []
 		self.openPort = False
+		self.time_elapsed = time.time()
+		self.sendTime = 15
 		
 	def open_serial(self): 
 		port='/dev/ttyAMA0'
@@ -41,21 +44,35 @@ class TendSerial():
 		self.openPort = True
 		return
 		
-	def send_serial(self, sendTime, right, left): 
+	def send_serial(self, right, left): 
 		# if time is greater than the sendTime
 		# send which ever right or left is greater
-		if(right > left): 
-			send = right
-		elif(left > right): 
-			send = left
-		else: 
-			send = equal
-		self.ser.write(send.encode()) 
+		
+		start = time.time()
+		print("hello")
+		end = time.time()
+		print(end - start)
+		
+		if(self.time_elapsed > self.sendTime): 
+			if(right > left): 
+				send = right
+			elif(left > right): 
+				send = left
+			else: 
+				send = equal
+		#self.ser.write(send.encode()) 
 		
 
 
 if __name__ == "__main__": 
-	myany = Animation() 
-	myany.open_serial()
+	tserial = TendSerial() 
+	#myany.open_serial()
+	while True:
+		tserial.send_serial(0,1)
+		key = cv2.waitKey(1) & 0xFF
+		# if the `q` key was pressed, break from the loop
+		if key == ord("q"):
+			break
+
 
 	
