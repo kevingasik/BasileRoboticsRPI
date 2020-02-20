@@ -66,8 +66,15 @@ if(openCM_comms.openPort == True):
 	print("[INFO} Success to opened Comm port to OpenCM Board...")
 
 # loop over the frames from the video stream
+
+
 while True:
 	
+	
+	if(openCM_comms.openPort == True): 
+		openCM_comms.do_every(1,openCM_comms.send_serial,0,1)
+	#for right now we will test the openCM port 
+	openCM_comms.do_everyTwo(target=openCM_comms.send_thread)
 	# grab the frame from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
 	frame = vs.read()
@@ -129,7 +136,7 @@ while True:
 						totalDown += 1
 				cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
 
-
+	
 	# construct a tuple of information we will be displaying on the
 	# frame
 	info = [
