@@ -39,7 +39,8 @@ class RealTimeHelper():
 		blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),0.007843, (300, 300), 127.5) 
 		return blob
 		
-	def draw_predictions(frame,startX,startY,endX,endY,COLORS,idx): 
+	def draw_predictions(frame,mytuple,COLORS,idx):
+		(startX,startY,endX,endY) = mytuple 
 		label = "{}: {:.2f}%".format(CLASSES[idx],confidence * 100)
 		cv2.rectangle(frame, (startX, startY), (endX, endY),COLORS[idx], 2)
 		y = startY - 15 if startY - 15 > 15 else startY + 15

@@ -74,7 +74,7 @@ while True:
 	if(openCM_comms.openPort == True): 
 		openCM_comms.do_every(1,openCM_comms.send_serial,0,1)
 	#for right now we will test the openCM port 
-	openCM_comms.do_everyTwo(target=openCM_comms.send_thread)
+	openCM_comms.send_thread()
 	# grab the frame from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
 	frame = vs.read()
@@ -117,8 +117,12 @@ while True:
 			centroids[i] = (cX, cY)
 			
 			# draw the prediction on the frame
-			label, y = rth.draw_predictions(frame,startX,startY,endX,endY,COLORS,idx)
-						
+			#label, y = rth.draw_predictions(frame,(startX,startY,endX,endY),COLORS,idx)
+			label = "{}: {:.2f}%".format(CLASSES[idx],confidence * 100)
+			cv2.rectangle(frame, (startX, startY), (endX, endY),COLORS[idx], 2)
+			y = startY - 15 if startY - 15 > 15 else startY + 15
+			cv2.putText(frame, label, (startX, y),cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
+					
 			for centroid in centroids:
 				direction = centroid[0]
 			
@@ -136,7 +140,8 @@ while True:
 						totalDown += 1
 				cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
 
-	
+	openCM_comms.right = totalDown
+	openCM_comms.left = totalUp
 	# construct a tuple of information we will be displaying on the
 	# frame
 	info = [

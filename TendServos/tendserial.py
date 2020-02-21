@@ -16,7 +16,7 @@ class TendSerial():
 		self.row1 = []
 		self.row2 = []
 		self.openPort = False
-		self.freq = 15
+		self.freq = 3
 		self.right = 0
 		self.left = 0
 		
@@ -43,8 +43,8 @@ class TendSerial():
 		self.ser.reset_output_buffer()
 		self.ser.close()
 		self.ser.open()
-		
 		self.openPort = True
+		
 		return
 				
 	def hello(self,s): 
@@ -63,12 +63,12 @@ class TendSerial():
 			time.sleep(next(g))
 			f(*args)
 	
-	def send_serial(self, right, left): 
+	def send_serial(self): 
 		# if time is greater than the sendTime
 		# send which ever right or left is greater
-		if(right > left): 
+		if(self.right > self.left): 
 			send = 'r'
-		elif(left > right): 
+		elif(self.left > self.right): 
 			send = 'l'
 		else: 
 			send = 'e'
@@ -76,45 +76,27 @@ class TendSerial():
 		return
 		#self.ser.write(send.encode()) 
 		
-	def do_everyTwo(self,freq,right,left):
-		next_call = time.time()
-		while True:
-			print (datetime.datetime.now())
-			next_call = next_call + freq;
-			time.sleep(next_call - time.time())
-			self.send_serial(right,left)
-			
-	def foo(self):
-		global next_call
-		print (datetime.datetime.now())
-		next_call = next_call+1
-		threading.Timer( next_call - time.time(), self.foo ).start()
-
 	def send_thread(self): 
-		timerThread = threading.Thread(target=tserial.do_everyTwo(self.freq,self.right,self.left))
+		timerThread = threading.Thread(target=lambda: self.do_every(self.freq,self.send_serial))
 		timerThread.daemon = True
 		timerThread.start()
-
+		
 
 if __name__ == "__main__": 
 	count = 0
 	tserial = TendSerial() 
 	#tserial.do_every(1,tserial.send_serial,0,1)
-	#tserial.send_thread()
-	next_call = time.time()
-	tserial.foo()
-	
-	#myany.open_serial()
+
+	#threadmy = threading.Thread(target=lambda: do_every(5, hello,'foo')).start()
+	tserial.send_thread()
+
 	while True:
-		#tserial.send_serial(0,1)
-		next_call = time.time()
-		
-		
 		count = count + 1
-		print(count)
 		if(count > 20000): 
 			tserial.right = 2
 			print(count)
+			count = 0
+			
 		key = cv2.waitKey(1) & 0xFF
 		
 		# if the `q` key was pressed, break from the loop
