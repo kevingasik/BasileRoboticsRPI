@@ -3,6 +3,7 @@ import os
 import time
 
 class RepeatedTimer(object):
+    
     def __init__(self, interval, function, *args, **kwargs):
         self._timer     = None
         self.interval   = interval
@@ -27,18 +28,29 @@ class RepeatedTimer(object):
         self._timer.cancel()
         self.is_running = False
         
+    def do_every(self,period,f,*args):
+		def g_tick():
+			t = time.time()
+			count = 0
+			while True:
+				count += 1
+				yield max(t + count*period - time.time(),0)
+		g = g_tick()
+		while True:
+			time.sleep(next(g))
+			f(*args)
+    
+    def send_thread(self,f): 
+		timerThread = threading.Thread(target=lambda: self.do_every(freq,f,*args))
+		timerThread.daemon = True
+		timerThread.start()
 
-def hello(name):
-    print ("Hello %s!" % name)
-  
 if __name__ == "__main__": 
     print ("starting...")
     rt = RepeatedTimer(1, hello, "World") # it auto-starts, no need of rt.start()
-    
     while count < 100000: 
         count = count + 1
         print(count) 
-        
     try:
         time.sleep(5) # your long-running job goes here...
     finally:

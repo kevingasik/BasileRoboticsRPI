@@ -51,7 +51,6 @@ rth.setSize(w,h)
 openCM_comms = TendSerial()
 #establish comms with an arduino
 
-
 try:
 	openCM_comms.open_serial()
 	# keep going
@@ -70,9 +69,8 @@ if(openCM_comms.openPort == True):
 
 while True:
 	
-	
 	if(openCM_comms.openPort == True): 
-		openCM_comms.do_every(1,openCM_comms.send_serial,0,1)
+		openCM_comms.send_thread()
 	#for right now we will test the openCM port 
 	openCM_comms.send_thread()
 	# grab the frame from the threaded video stream and resize it

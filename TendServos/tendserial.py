@@ -36,7 +36,6 @@ class TendSerial():
 			bytesize=serial.EIGHTBITS,
 			timeout=1
 		)	
-
 		self.ser.close()
 		self.ser.open()
 		self.ser.reset_input_buffer()
@@ -44,7 +43,6 @@ class TendSerial():
 		self.ser.close()
 		self.ser.open()
 		self.openPort = True
-		
 		return
 				
 	def hello(self,s): 
@@ -64,8 +62,7 @@ class TendSerial():
 			f(*args)
 	
 	def send_serial(self): 
-		# if time is greater than the sendTime
-		# send which ever right or left is greater
+		# if time is greater than the sendTime send which ever right or left is greater
 		if(self.right > self.left): 
 			send = 'r'
 		elif(self.left > self.right): 
