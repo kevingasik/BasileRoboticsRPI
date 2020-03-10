@@ -1,52 +1,83 @@
 import time
 import os
 import RPi.GPIO as GPIO
+import cv2
 
 
 class MGButtons():
-	switch1 = 18
-	switch2 = 17
-	switch3 = 27
-	switch4 = 22
-	switch5 = 23
 	GPIO.setmode(GPIO.BCM)
-	GPIO.setup(switch1,GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(switch2,GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(switch3,GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(switch4,GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(switch5,GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	#BCM17,11 Motor_INB
+	#BCM22 15 Motor_EnB
+	#BCM5,29 Motor_CS
+	#Motor_EnA, BCM13 33
+	#BCM26,37 Motor_INA
+	#MotorPWM BCM18_PCM_C 12 but in verision one it was where?
 	
 	def __init__(self): 
-		self.button1 = 18
-		self.button2 = 17
-		self.button3 = 27
-		self.button4 = 22
-		self.button5 = 23
+		self.button_dict = {} 
 		
+		# self.button_dict['red'] = {} 
+		# self.button_dict['red']['read'] = 23
+		# self.button_dict['red']['light'] = 37
+		# self.button_dict['red']['status'] = 'off'
+		
+		self.button_dict['red'] = {} 
+		self.button_dict['red']['read'] = 24
+		self.button_dict['red']['light'] = 13
+		self.button_dict['red']['status'] = 'off'
+		
+		self.button_dict['white'] = {} 
+		self.button_dict['white']['read'] = 25
+		self.button_dict['white']['light'] = 6
+		self.button_dict['white']['status'] = 'off'
+		
+		self.button_dict['green'] = {} 
+		self.button_dict['green']['read'] = 12
+		self.button_dict['green']['light'] = 22
+		self.button_dict['green']['status'] = 'off'
+		
+		self.button_dict['yellow'] = {} 
+		self.button_dict['yellow']['read'] = 16
+		self.button_dict['yellow']['light'] = 12
+		self.button_dict['yellow']['status'] = 'off'
+		
+		for key,value in self.button_dict.items():
+			#print(value['read'])
+			GPIO.setup(value['read'],GPIO.IN, pull_up_down=GPIO.PUD_UP)
+			GPIO.setup(value['light'],GPIO.OUT)
+			
 	def read_button(self,button): 
 		return GPIO.input(button)
 	
-	def get_buttons(self): 
-		return [self.button1, self.button2, self.button3, self.button4, self.button5]
+	#def get_buttons(self): 
+		#return [self.button1, self.button2, self.button3, self.button4, self.button5]
+	
 	
 	def read_buttons(self): 
-		return [GPIO.input(self.button1), GPIO.input(self.button2), GPIO.input(self.button3), GPIO.input(self.button4), GPIO.input(self.button5)] 
-		
-	def print_buttons(self): 
-		button_list = [GPIO.input(self.button1), GPIO.input(self.button2), GPIO.input(self.button3), GPIO.input(self.button4), GPIO.input(self.button5)] 
-		for item in button_list: 
-			print(item)
-		
-	#def light_button(self, button): 
-		# lights up one of the buttons
-		
-	#def light_buttons(self): 
-		# lights up all the buttons
+		for key,value in self.button_dict.items(): 
+			print(GPIO.input(value['read']))
+			
+			
+	def light_buttons(self): 
+		for key,value in self.button_dict.items(): 
+			GPIO.output(value['light'],1)
+	#def light_button(self,button): 
+		#this function will light up a specific button	
+			
+			
+			
+	#def read_return_buttons(self): 
+		#this function reads the buttons and then returns the ones that have been pressed
 	
 
 if __name__ == "__main__": 
 	buttons = MGButtons() 
-	print(buttons.read_buttons())
-	buttons.print_buttons()
-	print(buttons.get_buttons())
+	#while True: 
+		#buttons.read_buttons()
+		#print(buttons.read_button(16))
 	
+	#for key,value in MGButtons.button_dict.items(): 
+		#print(value['read'])
+	print(buttons.button_dict)
+	
+
